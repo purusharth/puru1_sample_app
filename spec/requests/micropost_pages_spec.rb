@@ -29,6 +29,21 @@ describe "Micropost pages" do
         expect { click_button "Post" }.to change(Micropost, :count).by(1)
       end
     end
+
+    # Chapter 10 Exercise 2 
+    describe "micropost pagination" do
+
+      before(:all) { 30.times { FactoryGirl.create(:micropost, user: user) } }
+      after(:all)  { @user.microposts.delete_all }
+
+      it { should have_selector('div.pagination') }
+
+      it "should list each micropost" do
+        @user.microposts.paginate(page: 1).each do |micropost|
+          expect(page).to have_selector('li', text: micropost.content)
+        end
+      end
+    end
   end
 
   describe "micropost destruction" do
