@@ -28,22 +28,7 @@ describe "Micropost pages" do
       it "should create a micropost" do
         expect { click_button "Post" }.to change(Micropost, :count).by(1)
       end
-    end
-
-    # Chapter 10 Exercise 2 
-    describe "micropost pagination" do
-
-      before(:all) { 30.times { FactoryGirl.create(:micropost, user: user) } }
-      after(:all)  { @user.microposts.delete_all }
-
-      it { should have_selector('div.pagination') }
-
-      it "should list each micropost" do
-        @user.microposts.paginate(page: 1).each do |micropost|
-          expect(page).to have_selector('li', text: micropost.content)
-        end
-      end
-    end
+    end 
   end
 
   describe "micropost destruction" do
@@ -56,5 +41,48 @@ describe "Micropost pages" do
         expect { click_link "delete" }.to change(Micropost, :count).by(-1)
       end
     end
+  end
+
+  # Chapter 10 Exercise 2 
+  describe "micropost pagination" do
+    before { visit root_path }
+    before { 49.times { FactoryGirl.create(:micropost, user: user) } }
+    after  { user.microposts.delete_all }
+
+    it "should have 49 microposts" do
+    	visit root_path
+  		expect(page).to have_selector('span', text: '49 microposts')
+  		expect(page).to have_selector('div.pagination')
+  	end
+
+    it "should list each micropost" do
+    	visit root_path
+        user.microposts.paginate(page: 1).each do |micropost|
+          expect(page).to have_selector('li', text: micropost.content)
+        end
+    end
+  end
+
+  # Chapter 10 Exercise 1
+  describe "sidebar micropost counts" do
+  	before { visit root_path}
+  	before { user.microposts.delete_all }
+
+  	it "should have 0 microposts" do
+  		expect(page).to have_selector('span', text: '0 microposts')
+  	end
+
+  	it "should have 1 micropost" do
+  		FactoryGirl.create(:micropost, user: user)
+  		visit root_path
+  		expect(page).to have_selector('span', text: '1 micropost')
+  		expect(page).not_to have_selector('span', text: '1 microposts')
+  	end
+
+    it "should have 2 microposts" do
+  	    2.times {FactoryGirl.create(:micropost, user: user)}
+  		visit root_path
+  		expect(page).to have_selector('span', text: '2 microposts')
+  	end
   end
 end
