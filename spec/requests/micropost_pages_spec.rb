@@ -51,11 +51,11 @@ describe "Micropost pages" do
 
     it "should have 49 microposts" do
     	visit root_path
-  		expect(page).to have_selector('span', text: '49 microposts')
+  		expect(page).to have_selector('span', text: '49 microposts') # check post count
   		expect(page).to have_selector('div.pagination') # check for pagination tag
   	end
 
-    it "should list each micropost" do
+    it "should list each micropost on page 1" do
     	visit root_path
         user.microposts.paginate(page: 1).each do |micropost| #verify each micropost on pg 1
           expect(page).to have_selector('li', text: micropost.content)
@@ -66,7 +66,7 @@ describe "Micropost pages" do
   # Chapter 10 Exercise 1
   describe "sidebar micropost counts" do
   	before { visit root_path}
-  	before { user.microposts.delete_all }
+  	after { user.microposts.delete_all }
 
   	it "should have 0 microposts" do
   		expect(page).to have_selector('span', text: '0 microposts')
@@ -80,9 +80,24 @@ describe "Micropost pages" do
   	end
 
     it "should have 2 microposts" do
-  	    2.times {FactoryGirl.create(:micropost, user: user)}
+      2.times {FactoryGirl.create(:micropost, user: user)}
   		visit root_path
   		expect(page).to have_selector('span', text: '2 microposts')
   	end
+  end
+
+  # Chapter 10 Exercise 4
+  describe "delete links" do
+    let(:user) { FactoryGirl.create(:user, email: "user@example.com") }
+    let(:other_user) { FactoryGirl.create(:user, email: "other@example.com") }
+    let!(:msg) {FactoryGirl.create(:micropost, user: other_user, content: "other user post")}
+    before do 
+      click_link "Sign out" # sign out other user
+      sign_in user
+      visit user_path(other_user)  
+    end
+    it { should have_content(msg.content) } # check msg is there
+    it { should_not have_link('delete') }   # check delete link not there
+    it { should have_link('Sign out') }     # check user is signed in
   end
 end
