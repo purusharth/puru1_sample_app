@@ -52,12 +52,12 @@ describe "Micropost pages" do
     it "should have 49 microposts" do
     	visit root_path
   		expect(page).to have_selector('span', text: '49 microposts')
-  		expect(page).to have_selector('div.pagination')
+  		expect(page).to have_selector('div.pagination') # check for pagination tag
   	end
 
     it "should list each micropost" do
     	visit root_path
-        user.microposts.paginate(page: 1).each do |micropost|
+        user.microposts.paginate(page: 1).each do |micropost| #verify each micropost on pg 1
           expect(page).to have_selector('li', text: micropost.content)
         end
     end
