@@ -199,5 +199,23 @@ describe User do
       it { should_not be_following(other_user) }
       its(:followed_users) { should_not include(other_user) }
     end
+
+    # Chapter 11 Exercise 1"
+    describe "relationships" do
+      let!(:new_user) { FactoryGirl.create(:user) }
+      before { new_user.follow!(@user) } #new_user is following user
+      # new_user -> user -> other_user
+
+      it "destroy " do
+        id = @user.id
+        #expect(@user.relationships).not_to be_empty
+        expect(Relationship.where(follower_id: id)).not_to be_empty # @user should be following someone
+        expect(Relationship.where(followed_id: id)).not_to be_empty # @user should have followers
+        @user.destroy
+        #no @user relationships should exist now
+        expect(Relationship.where(follower_id: id)).to be_empty
+        expect(Relationship.where(followed_id: id)).to be_empty
+      end
+    end
   end
 end
