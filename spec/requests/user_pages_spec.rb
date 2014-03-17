@@ -69,12 +69,6 @@ describe "User pages" do
     end
 
     describe "with valid information" do
-      #before do
-      #  fill_in "Name",         with: "Example User"
-      #  fill_in "Email",        with: "user@example.com"
-      #  fill_in "Password",     with: "foobar"
-      #  fill_in "Confirmation", with: "foobar"
-      #end
       before { valid_signup() }
 
       it "should create a user" do
@@ -156,6 +150,18 @@ describe "User pages" do
           it { should have_xpath("//input[@value='Follow']") }
         end
       end
+    end
+
+    # Chapter 11 Exercise 4
+    describe "follower/following counts" do
+      let(:other_user) { FactoryGirl.create(:user) }
+      before do
+        other_user.follow!(user)
+        visit user_path(user)
+      end
+
+      it { should have_link("0 following", href: following_user_path(user)) }
+      it { should have_link("1 followers", href: followers_user_path(user)) }
     end
   end
 
